@@ -8,33 +8,30 @@ namespace Ejercicio4
 {
     class Program
     {
-        public delegate int MiDelegado(IEnumerable<Musico> musicos);
-        private static int MiMetodo(IEnumerable<Musico> musicos)
-        {
-            var i = 0;
-            foreach (var item in musicos)
-            {
-                if (item is IAfinable) i++;
-            }
-            return i;
-        }
         static void Main(string[] args)
         {
             var violinista = new Violinista();
             var clarinetista = new Clarinetista();
             var triangulista = new Triangulista();
-            List<Musico> musicos = new List<Musico>();
-            musicos.Add(violinista);
-            musicos.Add(clarinetista);
-            musicos.Add(triangulista);
-            MiDelegado miMetodoEncapsulado = new MiDelegado(MiMetodo);
 
-            var res = miMetodoEncapsulado(musicos);
-            Console.WriteLine("El numero de musicos que implementan IAfinable es : "+ res);
-            //DirectorDeOrquesta director = new DirectorDeOrquesta(violinista, clarinetista,triangulista);
+            var publico = new List<Publico>();
 
-            //director.EmpezarSinfonia();
-            //director.TerminarSinfonia();
+
+
+            DirectorDeOrquesta director = new DirectorDeOrquesta(violinista, clarinetista, triangulista);
+            for (int i = 0; i < 5; i++)
+            {
+                var p = new Publico("Publico " + i.ToString());
+                director.EmpiezaSinfonia += delegate(object sender, EventArgs e)
+                                            { p.GuardarSilencio(); };
+                director.FinalizaSinfonia += delegate(object sender, EventArgs e)
+                                            { p.Aplaudir(); };
+
+                publico.Add(p);
+            }
+
+            director.EmpezarSinfonia();
+            director.TerminarSinfonia();
 
             Console.ReadKey();
         }
@@ -79,6 +76,10 @@ namespace Ejercicio4
         }
         public void EmpezarSinfonia()
         {
+            if (EmpiezaSinfonia != null)
+            {
+                EmpiezaSinfonia(this, EventArgs.Empty);
+            }
             foreach (var musico in musicos)
             {
                 musico.Tocar();
@@ -87,12 +88,18 @@ namespace Ejercicio4
 
         public void TerminarSinfonia()
         {
+            
             foreach (var musico in musicos)
             {
                 musico.Terminar();
             }
+            if (FinalizaSinfonia != null)
+            {
+                FinalizaSinfonia(this, EventArgs.Empty);
+            }
         }
-
+        public event EventHandler EmpiezaSinfonia;
+        public event EventHandler FinalizaSinfonia;
 
     }
 
@@ -133,6 +140,23 @@ namespace Ejercicio4
     public interface IAfinable
     {
         void Afinar();
+    }
+    public class Publico
+    { 
+        public string Nombre{ get; private set;}
+        public Publico (string nombre)
+	    {
+            this.Nombre = nombre;
+	    }
+        public void GuardarSilencio()
+        {
+            Console.WriteLine(Nombre+" esta guardando silencio");
+        }
+        public void Aplaudir()
+        {
+            Console.WriteLine(Nombre+" esta aplaudiendo");
+        }
+
     }
 
 }
