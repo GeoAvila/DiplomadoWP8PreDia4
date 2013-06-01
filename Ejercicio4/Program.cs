@@ -18,7 +18,7 @@ namespace Ejercicio4
 
 
 
-            DirectorDeOrquesta director = new DirectorDeOrquesta(violinista, clarinetista, triangulista);
+            DirectorDeOrquesta<Musico> director = new DirectorDeOrquesta<Musico>(violinista, clarinetista, triangulista);
             for (int i = 0; i < 5; i++)
             {
                 var p = new Publico("Publico " + i.ToString());
@@ -58,12 +58,12 @@ namespace Ejercicio4
         }
     }
 
-    public class DirectorDeOrquesta
+    public class DirectorDeOrquesta<T> where T:Musico
     {
-        private List<Musico> musicos;
-        public DirectorDeOrquesta(params Musico[] musicos)
+        private List<T> musicos;
+        public DirectorDeOrquesta(params T[] musicos)
         {
-            this.musicos = new List<Musico>(musicos);
+            this.musicos = new List<T>(musicos);
             foreach (var musico in musicos)
             {
                 if (musico is IAfinable)
