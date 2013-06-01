@@ -8,16 +8,33 @@ namespace Ejercicio4
 {
     class Program
     {
-
+        public delegate int MiDelegado(IEnumerable<Musico> musicos);
+        private static int MiMetodo(IEnumerable<Musico> musicos)
+        {
+            var i = 0;
+            foreach (var item in musicos)
+            {
+                if (item is IAfinable) i++;
+            }
+            return i;
+        }
         static void Main(string[] args)
         {
             var violinista = new Violinista();
             var clarinetista = new Clarinetista();
             var triangulista = new Triangulista();
-            DirectorDeOrquesta director = new DirectorDeOrquesta(violinista, clarinetista,triangulista);
+            List<Musico> musicos = new List<Musico>();
+            musicos.Add(violinista);
+            musicos.Add(clarinetista);
+            musicos.Add(triangulista);
+            MiDelegado miMetodoEncapsulado = new MiDelegado(MiMetodo);
 
-            director.EmpezarSinfonia();
-            director.TerminarSinfonia();
+            var res = miMetodoEncapsulado(musicos);
+            Console.WriteLine("El numero de musicos que implementan IAfinable es : "+ res);
+            //DirectorDeOrquesta director = new DirectorDeOrquesta(violinista, clarinetista,triangulista);
+
+            //director.EmpezarSinfonia();
+            //director.TerminarSinfonia();
 
             Console.ReadKey();
         }
